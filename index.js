@@ -3,7 +3,7 @@ machineLearningLib.matrixFunctions = {};
 machineLearningLib.neuralNetworkFunctions = {};
 
 machineLearningLib.sigmoid = function (x) {
-    return 1.0 / (1.0 + Math.E ^ (-x));
+    return 1.0 / (1.0 + Math.pow(Math.E, -x));
 }
 
 machineLearningLib.sigmoidGradient = function (x) {
@@ -65,7 +65,7 @@ machineLearningLib.matrixFunctions.matrixMultiplication = function (M1, M2) {
     }
     M3 = machineLearningLib.matrixFunctions.createMatrix(M1.length, M2[0].length);
     for (let i = 0; i < M1.length; i++) {
-        for (let j = 0; j < M2.length; j++) {
+        for (let j = 0; j < M2[0].length; j++) {
             for (let k = 0; k < M1[0].length; k++) {
                 M3[i][j] += M1[i][k] * M2[k][j];
             }
@@ -116,6 +116,7 @@ machineLearningLib.matrixFunctions.addColumn = function (M, standardValue) {
     if (standardValue === undefined) {
         standardValue = 0;
     }
+    M = JSON.parse(JSON.stringify(M));
     for (let i = 0; i < M.length; i++) {
         M[i].unshift(standardValue);
     }
@@ -161,7 +162,7 @@ machineLearningLib.neuralNetworkFunctions.costFunction = function (X, y, K, lamb
         console.log("My2", My2);
         let Mlog1 = machineLearningLib.matrixFunctions.executeOnAllElements(Mx, function (x) { return x <= 0 ? 0 : Math.log(x); });
         console.log("Mlog1", Mlog1);
-        let Mlog2 = machineLearningLib.matrixFunctions.executeOnAllElements(Mx, function (x) { return x <= 0 ? 0 : Math.log(1 - x); });
+        let Mlog2 = machineLearningLib.matrixFunctions.executeOnAllElements(Mx, function (x) { return (1 - x) <= 0 ? 0 : -Math.log(1 - x); });
         console.log("Mlog2", Mlog2);
         let M1 = machineLearningLib.matrixFunctions.matrixMultiplyingElements(My1, Mlog1);
         console.log("M1", M1);
