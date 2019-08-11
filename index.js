@@ -202,6 +202,14 @@ machineLearningLib.neuralNetworkFunctions.costFunction = function (X, y, K, thet
     return J;
 }
 
+machineLearningLib.neuralNetworkFunctions.gradientDescent = function (thetas, alpha, theta_grad) {
+    newThetas = [];
+    for (let i = 0; i < thetas.length; i++) {
+        newThetas.push(machineLearningLib.matrixFunctions.matrixMultiplyingElements(thetas[i], machineLearningLib.matrixFunctions.executeOnAllElements(theta_grad[i + 1], function (x) { return x * alpha; })));
+    }
+    return newThetas;
+}
+
 machineLearningLib.neuralNetworkFunctions.backPropagrate = function (X, y, K, thetas, lambda) {
     if (lambda === undefined) {
         lambda = 0;
@@ -257,6 +265,7 @@ machineLearningLib.neuralNetworkFunctions.backPropagrate = function (X, y, K, th
         theta_grad[l] = machineLearningLib.matrixFunctions.matrixAddition(theta_grad[l], machineLearningLib.matrixFunctions.addColumn(tg, 0));
         // theta_grad[l] += [zeros(size(Theta1, 1), 1) (lambda / m .* Theta1(:,2:end))];
     }
+
     return theta_grad;
 }
 
