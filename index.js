@@ -170,6 +170,22 @@ machineLearningLib.matrixFunctions.getColumn = function (M, column) {
     return M2;
 }
 
+machineLearningLib.matrixFunctions.getMaxIndexes = function (M) {
+    M2 = [];
+    for (let i = 0; i < M.length; i++) {
+        let max = -1;
+        let maxIndex = -1;
+        for (let j = 0; j < M[i].length; j++) {
+            if (M[i][j] > max) {
+                max = M[i][j];
+                maxIndex = j;
+            }
+        }
+        M2.push(maxIndex);
+    }
+    return M2;
+}
+
 machineLearningLib.neuralNetworkFunctions.forwardPropagate = function (X, theta) {
     return machineLearningLib.matrixFunctions.sigmoid(machineLearningLib.matrixFunctions.matrixMultiplication(X, machineLearningLib.matrixFunctions.transpose(theta)));
 }

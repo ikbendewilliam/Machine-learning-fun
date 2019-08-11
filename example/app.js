@@ -1,6 +1,24 @@
 const mf = machineLearningLib.matrixFunctions;
 const nn = machineLearningLib.neuralNetworkFunctions;
 
+// function readTextFile(file)
+// {
+//     var rawFile = new XMLHttpRequest();
+//     rawFile.open("GET", file, false);
+//     rawFile.onreadystatechange = function ()
+//     {
+//         if(rawFile.readyState === 4)
+//         {
+//             if(rawFile.status === 200 || rawFile.status == 0)
+//             {
+//                 var allText = rawFile.responseText;
+//                 alert(allText);
+//             }
+//         }
+//     }
+//     rawFile.send(null);
+// }
+
 X = [[0.1683, -0.1923], [0.1819, -0.1502], [0.0282, 0.0300], [-0.1514, 0.1826], [-0.1918, 0.1673], [-0.0559, -0.0018], [0.1314, -0.1692], [0.1979, -0.1811], [0.0824, -0.0265], [-0.1088, 0.1525], [-0.2000, 0.1913], [-0.1073, 0.0542], [0.0840, -0.1327], [0.1981, -0.1976], [0.1301, -0.0808], [-0.0576, 0.1103]]
 //y = [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1];
 y = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
@@ -25,7 +43,14 @@ for (let i = 0; i < repetitions; i++) {
     let J = nn.costFunction(a3, y, 4, thetas, lambda);
     theta_grad = nn.backPropagrate(X, y, 4, thetas, 1);
     thetas = nn.gradientDescent(thetas, alpha, theta_grad);
-    document.querySelector("#result").innerHTML += J + " - (" + (i + 1) + ")<br />";
+    let performance = 0;
+    let outputs = mf.getMaxIndexes(a3);
+    console.log(outputs);
+    for (let j = 0; j < X.length; j++) {
+        performance += (outputs[j] === (y[j] - 1));
+    }
+    performance /= X.length;
+    document.querySelector("#result").innerHTML += performance + " - (" + (i + 1) + ")<br />";
     Js.push(J);
 }
 console.log(Js);
