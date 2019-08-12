@@ -1,6 +1,7 @@
 machineLearningLib = {};
 machineLearningLib.matrixFunctions = {};
 machineLearningLib.neuralNetworkFunctions = {};
+machineLearningLib.mathFunctions = {};
 
 machineLearningLib.sigmoid = function (x) {
     return 1.0 / (1.0 + Math.pow(Math.E, -x));
@@ -186,6 +187,22 @@ machineLearningLib.matrixFunctions.getMaxIndexes = function (M) {
     return M2;
 }
 
+machineLearningLib.mathFunctions.complexLog = function (x) {
+    if (x < 0) {
+        return "(" + Math.log(-x) + "," + Math.PI + "i)";
+    } else {
+        return Math.log(-x)
+    }
+}
+
+// machineLearningLib.mathFunctions.complexTimes = function (x) {
+//     if (x < 0) {
+//         return "(" + Math.log(-x) + "," + Math.PI + "i)";
+//     } else {
+//         return Math.log(-x)
+//     }
+// }
+
 machineLearningLib.neuralNetworkFunctions.forwardPropagate = function (X, theta) {
     return machineLearningLib.matrixFunctions.sigmoid(machineLearningLib.matrixFunctions.matrixMultiplication(X, machineLearningLib.matrixFunctions.transpose(theta)));
 }
@@ -202,8 +219,8 @@ machineLearningLib.neuralNetworkFunctions.costFunction = function (X, y, K, thet
         let Mx = [machineLearningLib.matrixFunctions.getColumn(X, k)];
         let My1 = machineLearningLib.matrixFunctions.executeOnAllElements([y], function (x) { return -1 * (x === (k + 1)); });
         let My2 = machineLearningLib.matrixFunctions.executeOnAllElements([y], function (x) { return 1 - 1 * (x === (k + 1)); });
-        let Mlog1 = machineLearningLib.matrixFunctions.executeOnAllElements(Mx, function (x) { return x <= 0 ? 0 : Math.log(x); });
-        let Mlog2 = machineLearningLib.matrixFunctions.executeOnAllElements(Mx, function (x) { return (1 - x) <= 0 ? 0 : -Math.log(1 - x); });
+        let Mlog1 = machineLearningLib.matrixFunctions.executeOnAllElements(Mx, function (x) { return x < 0 ? -Math.log(-x) : Math.log(x); });
+        let Mlog2 = machineLearningLib.matrixFunctions.executeOnAllElements(Mx, function (x) { return (1 - x) < 0 ? Math.log(-(1 - x)) : -Math.log(1 - x); });
         let M1 = machineLearningLib.matrixFunctions.matrixMultiplyingElements(My1, Mlog1);
         let M2 = machineLearningLib.matrixFunctions.matrixMultiplyingElements(My2, Mlog2);
         let M = machineLearningLib.matrixFunctions.matrixAddition(M1, M2);
@@ -221,7 +238,7 @@ machineLearningLib.neuralNetworkFunctions.costFunction = function (X, y, K, thet
 machineLearningLib.neuralNetworkFunctions.gradientDescent = function (thetas, alpha, theta_grad) {
     newThetas = [];
     for (let i = 0; i < thetas.length; i++) {
-        newThetas.push(machineLearningLib.matrixFunctions.executeOnAllElements(machineLearningLib.matrixFunctions.matrixMultiplyingElements(thetas[i], theta_grad[i + 1]), function (x) { return x * alpha; }));
+        newThetas.push(machineLearningLib.matrixFunctions.matrixAddition(thetas[i], machineLearningLib.matrixFunctions.executeOnAllElements(machineLearningLib.matrixFunctions.matrixMultiplyingElements(thetas[i], theta_grad[i + 1]), function (x) { return -x * alpha; })));
     }
     return newThetas;
 }
