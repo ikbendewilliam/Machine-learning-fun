@@ -1,10 +1,10 @@
 const mf = machineLearningLib.matrixFunctions;
 const nn = machineLearningLib.neuralNetworkFunctions;
 
-const alpha = 1;
+const alpha = 0.1;
 const lambda = 0;
-const repetitions = 100;
-const hidden_units = 50;
+const repetitions = 200;
+const hidden_units = 100;
 const K = 10;
 
 // X = [[0, 0], [0, 1], [1, 0], [1, 1]];
@@ -25,25 +25,28 @@ theta2 = mf.initializeRandom(theta2);
 
 let Js = [];
 
-thetas = [theta1, theta2];
-for (let i = 0; i < repetitions; i++) {
-    z2 = mf.matrixMultiplication(mf.addColumn(X, 1), mf.transpose(thetas[0]));
-    a2 = mf.sigmoid(z2);
-    // a2 = nn.forwardPropagate(mf.addColumn(X, 1), thetas[0]);
-    a3 = nn.forwardPropagate(mf.addColumn(a2, 1), thetas[1]);
-    let J = nn.costFunction(a3, y, K, thetas, lambda);
-    theta_grad = nn.backPropagrate(X, y, K, thetas, lambda);
-    thetas = nn.gradientDescent(thetas, alpha, theta_grad);
-    let performance = 0;
-    let outputs = mf.getMaxIndexes(a3);
-    // debugger;
-    console.log(a3, outputs);
-    for (let j = 0; j < X.length; j++) {
-        performance += (outputs[j] === y[j]);
+function start() {
+    thetas = [theta1, theta2];
+    for (let i = 0; i < repetitions; i++) {
+        z2 = mf.matrixMultiplication(mf.addColumn(X, 1), mf.transpose(thetas[0]));
+        a2 = mf.sigmoid(z2);
+        // a2 = nn.forwardPropagate(mf.addColumn(X, 1), thetas[0]);
+        a3 = nn.forwardPropagate(mf.addColumn(a2, 1), thetas[1]);
+        let J = nn.costFunction(a3, y, K, thetas, lambda);
+        theta_grad = nn.backPropagrate(X, y, K, thetas, lambda);
+        thetas = nn.gradientDescent(thetas, alpha, theta_grad);
+        let performance = 0;
+        let outputs = mf.getMaxIndexes(a3);
+        // debugger;
+        // console.log(a3, outputs);
+        for (let j = 0; j < X.length; j++) {
+            performance += (outputs[j] === y[j]);
+        }
+        performance = performance / X.length;
+        console.log(i, performance, J);
+        document.querySelector("#result").innerHTML += performance + " - (" + (i + 1) + ")<br />";
+        Js.push(J);
     }
-    performance /= X.length;
-    document.querySelector("#result").innerHTML += performance + " - (" + (i + 1) + ")<br />";
-    Js.push(J);
+    console.log(Js);
 }
-console.log(Js);
-
+document.querySelector("#btn").addEventListener('click', start);
