@@ -181,7 +181,7 @@ machineLearningLib.matrixFunctions.getMaxIndexes = function (M) {
                 maxIndex = j;
             }
         }
-        M2.push(maxIndex);
+        M2.push(maxIndex + 1);
     }
     return M2;
 }
@@ -221,7 +221,7 @@ machineLearningLib.neuralNetworkFunctions.costFunction = function (X, y, K, thet
 machineLearningLib.neuralNetworkFunctions.gradientDescent = function (thetas, alpha, theta_grad) {
     newThetas = [];
     for (let i = 0; i < thetas.length; i++) {
-        newThetas.push(machineLearningLib.matrixFunctions.matrixMultiplyingElements(thetas[i], machineLearningLib.matrixFunctions.executeOnAllElements(theta_grad[i + 1], function (x) { return x * alpha; })));
+        newThetas.push(machineLearningLib.matrixFunctions.executeOnAllElements(machineLearningLib.matrixFunctions.matrixMultiplyingElements(thetas[i], theta_grad[i + 1]), function (x) { return x * alpha; }));
     }
     return newThetas;
 }
