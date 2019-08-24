@@ -108,8 +108,8 @@ def costFunction(X, y, K, thetas, lamda=0):
     J = 0
     for k in range(K):
         Mx = [[row[k] for row in X]]
-        My1 = [[-1 * (x == (k + 1)) for x in row] for row in y]
-        My2 = [[1 - 1 * (x == (k + 1)) for x in row] for row in y]
+        My1 = [[-1 * (x == k) for x in row] for row in y]
+        My2 = [[1 - 1 * (x == k) for x in row] for row in y]
         Mlog1 = [[log(x) for x in row] for row in Mx]
         Mlog2 = [[-log(1 - x) for x in row] for row in Mx]
         M1 = matrixElementMultiplication(transpose(My1), Mlog1)
@@ -162,13 +162,13 @@ def backPropagate(X, y, K, thetas, lamda=0):
 
             delta[l] = transpose(thetas[l - 1])
             delta[l] = matrixMultiplication(delta[l], delta[l + 1])
-            zd = matrixSigmoidGradient(addColumn(z[l - 1], 1))
-            delta[l] = matrixElementMultiplication(delta[l], addRow(removeColumn(zd)))
+            zd = addRow(matrixSigmoidGradient(z[l - 1]), 1)
+            delta[l] = matrixElementMultiplication(delta[l], zd)
 
     for l in range(len(thetas), 0, -1):
         theta_grad[l] = [[x / len(X) for x in row] for row in theta_grad[l]]
         tg = removeColumn(thetas[l - 1])
-        tg =  [[x * lamda / len(X) for x in row] for row in tg]
+        tg =  [[-x * lamda / len(X) for x in row] for row in tg]
         theta_grad[l] = matrixAddition(theta_grad[l], addColumn(tg, 0))
         #theta_grad[l] += [zeros(size(Theta1, 1), 1)(lamda / m .* Theta1(:, 2:end))]
     return theta_grad
@@ -182,31 +182,47 @@ def printsize(M):
     print(len(M), len(M[0]))
 
 def ml(X, y, thetas, alpha, lamda, K, repetitions):
-    for _ in range(repetitions):
+    for c in range(repetitions):
         a2 = forwardPropagate(addColumn(X, 1), thetas[0])
         a3 = forwardPropagate(addColumn(a2, 1), thetas[1])
         J = costFunction(a3, y, K, thetas, lamda)
-        print(J)
+        print(c, "J: %s" % J)
+        if (c % 3 == 0):
+            a2 = forwardPropagate(addColumn(X, 1), thetas[0])
+            a3 = forwardPropagate(addColumn(a2, 1), thetas[1])
+            outputs = matrixMaxIndexes(a3)
+            # print(outputs)
+            correct = 0
+            for i in range(len(y)):
+                if y[i][0] == outputs[i]:
+                    correct += 1
+            print("correct: %s / %s (%s)" % (correct, len(y), correct/len(y)))
         theta_grad = backPropagate(X, y, K, thetas, lamda)
         thetas = gradientDescent(thetas, alpha, theta_grad)
     outputs = matrixMaxIndexes(a3)
-    print(y, outputs)
+    correct = 0
+    for i in range(len(y)):
+        if y[i][0] == outputs[i]:
+            correct += 1
+    print("correct: %s / %s (%s)" % (correct, len(y), correct/len(y)))
     return thetas
 
 K = 10
 lamda = 0
-alpha = 0.1
-repetitions = 10
+alpha = 1
+repetitions = 100
 hidden_layer = 25
 X = loadFile('./data/data.json')
 y = loadFile('./data/labels.json')
+X = X[:100]
+y = y[:100]
 theta1 = matrix(len(X[0]) + 1, hidden_layer)
 theta2 = matrix(hidden_layer + 1, K)
 thetas = [theta1, theta2]
 for i in range(len(thetas)):
-    thetas[i] = initializeRandom(thetas[i])
+    thetas[i] = initializeRandom(thetas[i], 0.1)
 # thetas_ = loadFile('./data/thetas.json')
 # thetas = [thetas_['theta1'], thetas_['theta2']]
 print('data loaded')
-
+# print(thetas)
 ml(X, y, thetas, alpha, lamda, K, repetitions)
