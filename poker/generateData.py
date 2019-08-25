@@ -180,22 +180,30 @@ def get_highest_cards(raw_values, used_cards, amount): # returns the [amount] hi
     raw_values.reverse()
     return raw_values[:amount]
 
-hands, free_cards = init(2)
-board, free_cards = get_card(5, free_cards)
-print(hands, board)
-winners, winValue = get_winners(hands, board)
-for winner in winners:
-    print(hands[winner], winValue)
+X = []
+y = []
+game_count = 1000000
 
-print("> 8 - straight flush")
-print("> 7 - four of a kind")
-print("> 6 - full house")
-print("> 5 - flush")
-print("> 4 - straight")
-print("> 3 - three of a kind")
-print("> 2 - two pairs")
-print("> 1 - one pair")
-print("> 0 - high card")
+for c in range(game_count):
+    hands, free_cards = init(4)
+    board, free_cards = get_card(5, free_cards)
+    winners, winValue = get_winners(hands, board)
+    X.append([hands, board])
+    y.append([1 if i in winners else 0 for i in range(len(hands))])
+    if c % 1000 == 0:
+        print("%s/%s" % (c, game_count))
+
+with open('./data/data.txt', 'w') as file:
+    file.write("{'X':%s, 'y':%s}" % (X, y))
+# print("> 8 - straight flush")
+# print("> 7 - four of a kind")
+# print("> 6 - full house")
+# print("> 5 - flush")
+# print("> 4 - straight")
+# print("> 3 - three of a kind")
+# print("> 2 - two pairs")
+# print("> 1 - one pair")
+# print("> 0 - high card")
 
 # print(8, get_value([7, 6], [12, 11, 10, 9, 8]))
 # print(7, get_value([12, 12], [12, 12, 10, 9, 8]))
