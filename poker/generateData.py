@@ -48,7 +48,7 @@ def get_value(hand, board):
     if len(straight) != 0:
         if len(flush) != 0:
             for s in straight:
-                if len(straight_flush) < 5:
+                if len(straight_flush) >= 5:
                     break
                 for i in s:
                     if i in flush:
@@ -129,16 +129,41 @@ def cleanup_list(lists):
     return clean_lists
 
 def get_flush(suits): # returns a series of cards if found 5 or more of the same suit
+    cards = [(suits[i], i) for i in range(len(suits))]
+    suits_found = [[] for _ in range(4)]
+    for card in cards:
+        suits_found[card[0]].append(card[1])
+    for s in suits_found:
+        if len(s) >= 5:
+            return s
     return []
 
+def get_x_of_a_kind(raw_values, x):
+    couples = []
+    cards = [(raw_values[i], i) for i in range(len(raw_values))]
+    values_found = [[] for _ in range(13)]
+    for card in cards:
+        values_found[card[0]].append(card[1])
+    for s in values_found:
+        if len(s) >= x:
+            couples.append(s)
+    return couples
+
+
 def get_four_of_a_kind(raw_values): # returns a series of cards if found 4 of the same raw_value
+    couples = get_x_of_a_kind(raw_values, 4)
+    if len(couples) >= 1:
+        return couples[0]
     return []
 
 def get_three_of_a_kind(raw_values): # returns the highest series of cards if found 3 of the same raw_value
+    couples = get_x_of_a_kind(raw_values, 3)
+    if len(couples) >= 1:
+        return couples[0]
     return []
 
 def get_two_of_a_kind(raw_values): # returns multiple series of cards if found (2 of the same raw_value) any number of times
-    return []
+    return get_x_of_a_kind(raw_values, 2)
 
 def get_highest_pairs(pairs, amount): # returns a single series of cards from the [amount] highest pairs found in [pairs] in order
     return []
