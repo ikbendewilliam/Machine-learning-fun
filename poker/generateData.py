@@ -193,8 +193,8 @@ for c in range(game_count):
     if c % 1000 == 0:
         print("%s/%s" % (c, game_count))
 
-with open('./data/data.txt', 'w') as file:
-    file.write("{'X':%s, 'y':%s}" % (X, y))
+with open('./data/data.json', 'w') as file:
+    file.write('{"X":%s, "y":%s}' % (X, y))
 # print("> 8 - straight flush")
 # print("> 7 - four of a kind")
 # print("> 6 - full house")
