@@ -32,7 +32,7 @@ def get_winners(hands, board):
             winners = [i]
         elif m == value:
             winners.append(i)
-    return winners
+    return winners, m
 
 def get_value(hand, board):
     raw_values = [card % 13 for card in hand + board]
@@ -59,35 +59,38 @@ def get_value(hand, board):
                         break
     
     if len(straight_flush) >= 5: # straight flush or royal flush
-        highest_cards = get_highest_cards(straight_flush, [], 5)
-        return 8
+        return 8 + highest_cards_value(straight_flush, [], 5)
     elif len(four_of_a_kind) > 0: # four of a kind
-        highest_cards = get_highest_cards(raw_values, four_of_a_kind, 1)
-        return 7
+        return 7 + highest_cards_value(four_of_a_kind, [], 1) + highest_cards_value(raw_values, four_of_a_kind, 1) / 80
     elif len(three_of_a_kind) > 0 and len(two_of_a_kind) >= 2: # full house
-        return 6
+        highest_pair = get_highest_pairs(two_of_a_kind, 1)
+        highest_pair = highest_pair[0]
+        return 6 + highest_cards_value(three_of_a_kind, [], 1) + highest_cards_value(highest_pair, [], 1) / 80+ highest_cards_value(raw_values, highest_pair, 3) / 80 / 80
     elif len(flush) >= 5: # flush
-        highest_cards = get_highest_cards(flush, [], 5)
-        return 5
+        return 5 + highest_cards_value(flush, [], 5)
     elif len(straight) > 0: # straight
-        highest_cards = get_highest_cards(straight, [], 5)
-        return 4
+        straight = [[raw_values[i] for i in straight_found] for straight_found in straight]
+        straight.sort()
+        straight.reverse()
+        return 4 + highest_cards_value(straight[0], [], 5)
     elif len(three_of_a_kind) > 0: # three of a kind
-        highest_cards = get_highest_cards(raw_values, three_of_a_kind, 2)
-        return 3
+        return 3 + highest_cards_value(three_of_a_kind, [], 1) + highest_cards_value(raw_values, three_of_a_kind, 2) / 80
     elif len(two_of_a_kind) >= 2: # two pair
         highest_pairs = get_highest_pairs(two_of_a_kind, 2)
-        highest_cards = get_highest_cards(raw_values, highest_pairs, 1)
-        return 2
+        return 2 + highest_cards_value(highest_pairs[0], [], 1) + highest_cards_value(highest_pairs[1], [], 1) / 80 + highest_cards_value(raw_values, highest_pairs[0] + highest_pairs[1], 1) / 80 / 80
     elif len(two_of_a_kind) > 0: # one pair
         highest_pair = get_highest_pairs(two_of_a_kind, 1)
-        highest_cards = get_highest_cards(raw_values, highest_pair, 3)
-        return 1
+        highest_pair = highest_pair[0]
+        return 1 + highest_cards_value(highest_pair, [], 1) + highest_cards_value(raw_values, highest_pair, 3) / 80
     else: # high card
-        highest_cards = get_highest_cards(raw_values, [], 5)
-        return 0
+        return highest_cards_value(raw_values, [], 5)
 
     return sum(raw_values)
+
+def highest_cards_value(raw_values, used_cards, amount):
+    highest_cards = get_highest_cards(raw_values, used_cards, amount)
+    highest_cards = [highest_cards[i] + 13 * (5 - i) for i in range(len(highest_cards))]
+    return sum(highest_cards) / (80 * len(highest_cards))
 
 def get_straight(raw_values): # returns all straights found
     cards = [(raw_values[i], i) for i in range(len(raw_values))]
@@ -143,7 +146,7 @@ def get_x_of_a_kind(raw_values, x):
     cards = [(raw_values[i], i) for i in range(len(raw_values))]
     values_found = [[] for _ in range(13)]
     for card in cards:
-        values_found[card[0]].append(card[1])
+        values_found[card[0]].append(card[0])
     for s in values_found:
         if len(s) >= x:
             couples.append(s)
@@ -166,27 +169,42 @@ def get_two_of_a_kind(raw_values): # returns multiple series of cards if found (
     return get_x_of_a_kind(raw_values, 2)
 
 def get_highest_pairs(pairs, amount): # returns a single series of cards from the [amount] highest pairs found in [pairs] in order
-    return []
+    pairs.sort()
+    pairs.reverse()
+    return pairs[:amount]
 
 def get_highest_cards(raw_values, used_cards, amount): # returns the [amount] highest cards in [raw_values] that are not in [used_cards] in order
-    # get the highest card
-    # call get_highest_cards with highest card in used_cards and amount -1 if amount -1 > 0
-    # return sequence of highest card + value returned
-    return []
+    for card in used_cards:
+        raw_values.remove(card)
+    raw_values.sort()
+    raw_values.reverse()
+    return raw_values[:amount]
 
-# hands, free_cards = init(2)
-# board, free_cards = get_card(5, free_cards)
-# print(hands, free_cards, board)
-# for winner in get_winners(hands, board):
-#     print(hands[winner])
+hands, free_cards = init(2)
+board, free_cards = get_card(5, free_cards)
+print(hands, board)
+winners, winValue = get_winners(hands, board)
+for winner in winners:
+    print(hands[winner], winValue)
 
-print(8, get_value([7, 6], [12, 11, 10, 9, 8]))
-print(7, get_value([7, 7], [7, 7, 10, 9, 8]))
-print(6, get_value([7, 7], [12, 12, 12, 9, 8]))
-print(5, get_value([7, 6], [2, 0, 10, 19, 18]))
-print(4, get_value([51, 50], [13, 13, 10, 9, 8]))
-print(3, get_value([7, 7], [7, 22, 27, 23, 24]))
-print(2, get_value([7, 7], [12, 12, 21, 29, 28]))
-print(1, get_value([7, 7], [21, 22, 25, 26, 36]))
-print(0, get_value([7, 6], [21, 22, 25, 26, 37]))
+print("> 8 - straight flush")
+print("> 7 - four of a kind")
+print("> 6 - full house")
+print("> 5 - flush")
+print("> 4 - straight")
+print("> 3 - three of a kind")
+print("> 2 - two pairs")
+print("> 1 - one pair")
+print("> 0 - high card")
+
+# print(8, get_value([7, 6], [12, 11, 10, 9, 8]))
+# print(7, get_value([12, 12], [12, 12, 10, 9, 8]))
+# print(6, get_value([11, 11], [12, 12, 12, 9, 8]))
+# print(5, get_value([12, 11], [10, 9, 7, 19, 18]))
+# print(4, get_value([51, 50], [38, 25, 10, 9, 8]))
+# print(3, get_value([12, 12], [12, 22, 27, 23, 24]))
+# print(2, get_value([11, 11], [12, 12, 21, 29, 28]))
+# print(1, get_value([12, 12], [21, 22, 1, 26, 36]))
+# print(0, get_value([7, 6], [21, 22, 25, 26, 37]))
+
 
