@@ -47,13 +47,16 @@ def get_value(hand, board):
 
     if len(straight) != 0:
         if len(flush) != 0:
-            for i in range(len(straight)):
-                if i in flush:
-                    straight_flush.append(i)
-                elif len(straight_flush) < 5:
-                    straight_flush = []
-                else:
+            for s in straight:
+                if len(straight_flush) < 5:
                     break
+                for i in s:
+                    if i in flush:
+                        straight_flush.append(i)
+                    elif len(straight_flush) < 5:
+                        straight_flush = []
+                    else:
+                        break
     
     if len(straight_flush) >= 5: # straight flush or royal flush
         highest_cards = get_highest_cards(straight_flush, [], 5)
@@ -66,7 +69,7 @@ def get_value(hand, board):
     elif len(flush) >= 5: # flush
         highest_cards = get_highest_cards(flush, [], 5)
         return 5
-    elif len(straight) >= 5: # straight
+    elif len(straight) > 0: # straight
         highest_cards = get_highest_cards(straight, [], 5)
         return 4
     elif len(three_of_a_kind) > 0: # three of a kind
@@ -86,8 +89,44 @@ def get_value(hand, board):
 
     return sum(raw_values)
 
-def get_straight(raw_values): # returns a straight if found, as long as possible
-    return []
+def get_straight(raw_values): # returns all straights found
+    cards = [(raw_values[i], i) for i in range(len(raw_values))]
+    cards.sort()
+    sequences = []
+    for i in range(len(cards[4:])):
+        sequences += [find_straight(cards[i:], [])]
+    indexes = [[i[1] for i in sequence] for sequence in cleanup_list(sequences)]
+    while [] in indexes:
+        indexes.remove([])
+    return indexes
+
+def find_straight(cards, s):
+    if len(s) == 0:
+        return find_straight(cards[1:], [cards[0]])
+    elif len(cards) + len(s) < 5:
+        return []
+    elif len(cards) == 0:
+        return s
+    elif cards[0][0] == s[-1][0]:
+        return [find_straight(cards[1:], s), find_straight(cards[1:], s[:-1] + [cards[0]])]
+    elif cards[0][0] == s[-1][0] + 1:
+        return find_straight(cards[1:], s + [cards[0]])
+    elif len(s) >= 5:
+        return s
+    else:
+        return []
+
+def cleanup_list(lists):
+    clean_lists = []
+    for l in lists:
+        if len(l) == 0:
+            continue
+        if type(l[0]) == tuple:
+            clean_lists.append(l)
+        else:
+            for j in cleanup_list(l):
+                clean_lists.append(j)
+    return clean_lists
 
 def get_flush(suits): # returns a series of cards if found 5 or more of the same suit
     return []
@@ -121,7 +160,7 @@ print(7, get_value([7, 7], [7, 7, 10, 9, 8]))
 print(6, get_value([7, 7], [12, 12, 12, 9, 8]))
 print(5, get_value([7, 6], [2, 0, 10, 19, 18]))
 print(4, get_value([51, 50], [13, 13, 10, 9, 8]))
-print(3, get_value([7, 7], [7, 21, 22, 23, 24]))
+print(3, get_value([7, 7], [7, 22, 27, 23, 24]))
 print(2, get_value([7, 7], [12, 12, 21, 29, 28]))
 print(1, get_value([7, 7], [21, 22, 25, 26, 36]))
 print(0, get_value([7, 6], [21, 22, 25, 26, 37]))
