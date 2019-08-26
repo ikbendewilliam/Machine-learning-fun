@@ -8,15 +8,15 @@ I wrote a little library to try out some neural network stuff. The library isn't
 I use tensorflow basic stuff to try and learn to play poker.
 
 results:
-1. - straight flush
-1. - four of a kind
-1. - full house
-1. - flush
-1. - straight
-1. - three of a kind
-1. - two pairs
-1. - one pair
-1. - high card
+1. straight flush
+1. four of a kind
+1. full house
+1. flush
+1. straight
+1. three of a kind
+1. two pairs
+1. one pair
+1. high card
 
 Model "poker01.h5" (MSE: ~0.165)
 1. [[1.]]
