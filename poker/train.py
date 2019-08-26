@@ -43,7 +43,7 @@ with open("data/data.json", "r") as f:
 data = json.loads(data)
 X, y = data['X'], data['y']
 # For testing, only use x samples
-# X, y = X[:1000], y[:1000]
+X, y = X[:10000], y[:10000]
 
 # Convert data
 print("Convert data")
@@ -69,8 +69,7 @@ y_test = convert_to_array(y[split_integer:])
 
 print("Creating model")
 model = tf.keras.models.Sequential([
-  tf.keras.layers.Dense(520, input_shape=(52,), activation='relu'),
-  tf.keras.layers.Dense(520, activation='relu'),
+  tf.keras.layers.Dense(5200, input_shape=(52,), activation='relu'),
   tf.keras.layers.Dense(520, activation='relu'),
   tf.keras.layers.Dense(1, activation='sigmoid')
 ])
@@ -86,4 +85,4 @@ print("Evaluating model")
 model.evaluate(x_test, y_test)
 
 print("Saving model")
-model.save('./models/poker01.h5')
+model.save('./models/poker03.h5')
