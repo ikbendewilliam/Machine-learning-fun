@@ -6,19 +6,20 @@ I wrote a little library to try out some neural network stuff. The library isn't
 ## Poker
 
 I use tensorflow basic stuff to try and learn to play poker.
+
 results:
-> 8 - straight flush
-> 7 - four of a kind
-> 6 - full house
-> 5 - flush
-> 4 - straight
-> 3 - three of a kind
-> 2 - two pairs
-> 1 - one pair
-> 0 - high card
+1. straight flush
+1. four of a kind
+1. full house
+1. flush
+1. straight
+1. three of a kind
+1. two pairs
+1. one pair
+1. high card
 
 poker01.h5 MSE ~0.165
-8. [[1.]]
+1. [[1.]]
 7. [[0.68580973]]
 6. [[0.78495437]]
 5. [[0.9385425]]
@@ -29,7 +30,7 @@ poker01.h5 MSE ~0.165
 0. [[0.00660706]]
 
 poker02.h5 MSE: 0.1609 (trained with 10k samples)
-8. [[0.99907243]]
+1. [[0.99907243]]
 7. [[0.9798028]]
 6. [[0.84834665]]
 5. [[0.11785185]]
